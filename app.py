@@ -2,6 +2,9 @@ from flask import Flask, render_template, request, redirect, session
 from flask_session import Session
 
 import pickle
+import matplotlib
+matplotlib.use("Agg")
+
 import matplotlib.pyplot as plt
 import pandas as pd
 import sqlite3
