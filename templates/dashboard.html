@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Dashboard</title>
+
+    <style>
+
+        body {
+
+            font-family: Arial;
+            background: linear-gradient(to right, #667eea, #764ba2);
+            color: white;
+            text-align: center;
+            padding-top: 50px;
+        }
+
+        .card {
+
+            background: white;
+            color: black;
+            padding: 30px;
+            margin: 20px;
+            border-radius: 15px;
+            display: inline-block;
+            width: 220px;
+            font-size: 24px;
+        }
+
+        button {
+
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <h1>Analytics Dashboard</h1>
+
+    <div class="card">
+
+        <h2>Total Reviews</h2>
+
+        <p>{{ total }}</p>
+
+    </div>
+
+    <div class="card">
+
+        <h2>Positive</h2>
+
+        <p>{{ positive }}</p>
+
+    </div>
+
+    <div class="card">
+
+        <h2>Negative</h2>
+
+        <p>{{ negative }}</p>
+
+    </div>
+
+    <div class="card">
+
+        <h2>Neutral</h2>
+
+        <p>{{ neutral }}</p>
+
+    </div>
+
+    <br><br>
+
+    <a href="/home">
+
+        <button>
+
+            Back to Home
+
+        </button>
+
+    </a>
+
+</body>
+
+</html>

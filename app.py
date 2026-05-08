@@ -3,6 +3,8 @@ from flask_session import Session
 
 import pickle
 import matplotlib
+
+# IMPORTANT FOR RENDER
 matplotlib.use("Agg")
 
 import matplotlib.pyplot as plt
@@ -23,11 +25,37 @@ app.config["SESSION_TYPE"] = "filesystem"
 
 Session(app)
 
-# Load trained model
+# Load model
 model = pickle.load(open("sentiment_model.pkl", "rb"))
 
 # Load vectorizer
 vectorizer = pickle.load(open("vectorizer.pkl", "rb"))
+
+# ---------------- CREATE DATABASE ---------------- #
+
+conn = sqlite3.connect("history.db")
+
+cursor = conn.cursor()
+
+cursor.execute("""
+
+CREATE TABLE IF NOT EXISTS history (
+
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+    review TEXT,
+
+    prediction TEXT,
+
+    emotion TEXT
+
+)
+
+""")
+
+conn.commit()
+
+conn.close()
 
 # ---------------- LOGIN PAGE ---------------- #
 
@@ -37,7 +65,7 @@ def login():
     return render_template("login.html")
 
 
-# ---------------- LOGIN HANDLER ---------------- #
+# ---------------- LOGIN ---------------- #
 
 @app.route("/login", methods=["POST"])
 def handle_login():
@@ -46,7 +74,6 @@ def handle_login():
 
     password = request.form["password"]
 
-    # Simple login
     if username == "admin" and password == "admin123":
 
         session["user"] = username
@@ -56,7 +83,7 @@ def handle_login():
     return "Invalid Username or Password"
 
 
-# ---------------- HOME PAGE ---------------- #
+# ---------------- HOME ---------------- #
 
 @app.route("/home")
 def home():
@@ -67,7 +94,7 @@ def home():
     return render_template("index.html")
 
 
-# ---------------- SINGLE PREDICTION ---------------- #
+# ---------------- PREDICT ---------------- #
 
 @app.route("/predict", methods=["POST"])
 def predict():
@@ -75,19 +102,15 @@ def predict():
     if "user" not in session:
         return redirect("/")
 
-    # User input
     text = request.form["text"]
 
-    # Clean text
     cleaned_text = clean_text(text)
 
-    # Convert to vector
     vector_input = vectorizer.transform([cleaned_text])
 
-    # Predict sentiment
     prediction = model.predict(vector_input)[0]
 
-    # Emotion detection
+    # Emotion
     if prediction == "positive":
         emotion = "😊 Happy"
 
@@ -121,23 +144,20 @@ def predict():
 
     plt.title("Sentiment Analysis Result")
 
-    # Save chart
     plt.savefig("static/chart.png")
 
     plt.close()
 
-    # Create Word Cloud
+    # Word Cloud
     wordcloud = WordCloud(
         width=800,
         height=400,
         background_color="white"
     ).generate(cleaned_text)
 
-    # Save word cloud
     wordcloud.to_file("static/wordcloud.png")
 
-    # ---------------- SAVE TO DATABASE ---------------- #
-
+    # Save database
     conn = sqlite3.connect("history.db")
 
     cursor = conn.cursor()
@@ -166,7 +186,6 @@ def predict():
 
     conn.close()
 
-    # Return result
     return render_template(
         "index.html",
         prediction=prediction,
@@ -175,68 +194,23 @@ def predict():
     )
 
 
-# ---------------- CSV UPLOAD ---------------- #
-
-@app.route("/upload", methods=["POST"])
-def upload():
-
-    if "user" not in session:
-        return redirect("/")
-
-    file = request.files["file"]
-
-    # Read CSV
-    df = pd.read_csv(file)
-
-    results = []
-
-    # Analyze reviews
-    for review in df["review"]:
-
-        cleaned = clean_text(review)
-
-        vector = vectorizer.transform([cleaned])
-
-        prediction = model.predict(vector)[0]
-
-        results.append(
-            {
-                "review": review,
-                "prediction": prediction
-            }
-        )
-
-    return render_template(
-        "index.html",
-        bulk_results=results
-    )
-
-
-# ---------------- ABOUT PAGE ---------------- #
+# ---------------- ABOUT ---------------- #
 
 @app.route("/about")
 def about():
 
-    if "user" not in session:
-        return redirect("/")
-
     return render_template("about.html")
 
 
-# ---------------- HISTORY PAGE ---------------- #
+# ---------------- HISTORY ---------------- #
 
 @app.route("/history")
 def history():
 
-    if "user" not in session:
-        return redirect("/")
-
-    # Connect database
     conn = sqlite3.connect("history.db")
 
     cursor = conn.cursor()
 
-    # Read history
     cursor.execute("SELECT * FROM history")
 
     data = cursor.fetchall()
@@ -246,6 +220,48 @@ def history():
     return render_template(
         "history.html",
         history=data
+    )
+
+
+# ---------------- DASHBOARD ---------------- #
+
+@app.route("/dashboard")
+def dashboard():
+
+    conn = sqlite3.connect("history.db")
+
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT COUNT(*) FROM history")
+
+    total = cursor.fetchone()[0]
+
+    cursor.execute(
+        "SELECT COUNT(*) FROM history WHERE prediction='positive'"
+    )
+
+    positive = cursor.fetchone()[0]
+
+    cursor.execute(
+        "SELECT COUNT(*) FROM history WHERE prediction='negative'"
+    )
+
+    negative = cursor.fetchone()[0]
+
+    cursor.execute(
+        "SELECT COUNT(*) FROM history WHERE prediction='neutral'"
+    )
+
+    neutral = cursor.fetchone()[0]
+
+    conn.close()
+
+    return render_template(
+        "dashboard.html",
+        total=total,
+        positive=positive,
+        negative=negative,
+        neutral=neutral
     )
 
 
@@ -259,7 +275,7 @@ def logout():
     return redirect("/")
 
 
-# ---------------- RUN APP ---------------- #
+# ---------------- RUN ---------------- #
 
 if __name__ == "__main__":
     app.run(debug=True)
