@@ -1,0 +1,8 @@
+flask
+flask-session
+pandas
+matplotlib
+wordcloud
+scikit-learn
+nltk
+gunicorn

@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>AI Sentiment Analysis Tool</title>
+
+    <style>
+
+        body {
+            font-family: Arial;
+            background: linear-gradient(to right, #667eea, #764ba2);
+            color: white;
+            text-align: center;
+            padding-top: 50px;
+        }
+
+        .container {
+            background: white;
+            color: black;
+            width: 70%;
+            margin: auto;
+            padding: 30px;
+            border-radius: 15px;
+        }
+
+        textarea {
+            width: 80%;
+            height: 120px;
+            padding: 10px;
+            font-size: 16px;
+        }
+
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #5a67d8;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        .result {
+            margin-top: 25px;
+            font-size: 24px;
+        }
+
+        img {
+            margin-top: 20px;
+        }
+
+        table {
+            margin: auto;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 10px;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>AI Sentiment Analysis Tool</h1>
+
+        <!-- Single Prediction -->
+
+        <form action="/predict" method="POST">
+
+            <textarea
+                name="text"
+                placeholder="Enter your review here..."></textarea>
+
+            <br><br>
+
+            <button type="submit">
+                Analyze Sentiment
+            </button>
+
+        </form>
+
+        <!-- Prediction Result -->
+
+        {% if prediction %}
+
+            <div class="result">
+
+                <h2>Prediction: {{ prediction }}</h2>
+
+                <h2>Emotion: {{ emotion }}</h2>
+
+                <img
+                    src="{{ chart }}"
+                    width="300">
+
+                <br><br>
+
+                <h2>Word Cloud</h2>
+
+                <img
+                    src="static/wordcloud.png"
+                    width="500">
+
+            </div>
+
+        {% endif %}
+
+        <hr>
+
+        <!-- CSV Upload -->
+
+        <h2>Upload CSV File</h2>
+
+        <form
+            action="/upload"
+            method="POST"
+            enctype="multipart/form-data">
+
+            <input type="file" name="file">
+
+            <br><br>
+
+            <button type="submit">
+                Upload & Analyze
+            </button>
+
+        </form>
+
+        <!-- Bulk Results -->
+
+        {% if bulk_results %}
+
+            <hr>
+
+            <h2>Bulk Analysis Results</h2>
+
+            <table border="1">
+
+                <tr>
+                    <th>Review</th>
+                    <th>Prediction</th>
+                </tr>
+
+                {% for item in bulk_results %}
+
+                <tr>
+
+                    <td>{{ item.review }}</td>
+
+                    <td>{{ item.prediction }}</td>
+
+                </tr>
+
+                {% endfor %}
+
+            </table>
+
+        {% endif %}
+
+        <br><br>
+
+        <a href="/history">
+
+            <button>
+
+                View History
+
+            </button>
+
+        </a>
+
+        <a href="/about">
+
+            <button>
+
+                About Project
+
+            </button>
+
+        </a>
+
+        <a href="/logout">
+
+            <button>
+
+                Logout
+
+            </button>
+
+        </a>
+
+    </div>
+
+</body>
+
+</html>

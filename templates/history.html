@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>History</title>
+
+    <style>
+
+        body {
+            font-family: Arial;
+            background: linear-gradient(to right, #667eea, #764ba2);
+            color: white;
+            text-align: center;
+            padding-top: 50px;
+        }
+
+        .container {
+
+            background: white;
+            color: black;
+            width: 80%;
+            margin: auto;
+            padding: 30px;
+            border-radius: 15px;
+        }
+
+        table {
+
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+
+            border: 1px solid black;
+            padding: 12px;
+        }
+
+        button {
+
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 8px;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>Analysis History</h1>
+
+        <table>
+
+            <tr>
+
+                <th>ID</th>
+
+                <th>Review</th>
+
+                <th>Prediction</th>
+
+                <th>Emotion</th>
+
+            </tr>
+
+            {% for item in history %}
+
+            <tr>
+
+                <td>{{ item[0] }}</td>
+
+                <td>{{ item[1] }}</td>
+
+                <td>{{ item[2] }}</td>
+
+                <td>{{ item[3] }}</td>
+
+            </tr>
+
+            {% endfor %}
+
+        </table>
+
+        <br><br>
+
+        <a href="/home">
+
+            <button>
+
+                Back to Home
+
+            </button>
+
+        </a>
+
+    </div>
+
+</body>
+
+</html>
